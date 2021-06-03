@@ -1,0 +1,4 @@
+Caif LDAP note:
+thêm 2 file 
+libeay.dll
+ssleay32.dll

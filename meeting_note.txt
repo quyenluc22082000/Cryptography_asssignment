@@ -1,0 +1,45 @@
+Web app
+
+username password
+
+XAMPP: apache web server: has LDAP module: client side
+ldap_bind(infor, password) connect to LDAP server
+
+LDAP: giao thuc ket noi toi LDAP server
+
+LDAP server: chua du lieu o dang thu muc, muc dich nham thuc hien nhung tac vu truy xuat
+du lieu, trong do tac vu read chiem ti le nhieu hon write -> thich hop cho xac thuc, vi
+user thuong it khi thay doi mat khau
+Cai dat Apache Directory Studio de tao LDAP server (nen dat hd cai dat trong README)
+
+*muon connect toi LDAP server, may client cung phai cai LDAP(XAMPP co module LDAP ho tro cho
+viec nay)
+
+smartcard + PIN: authentication: something you have, smartcard: luu tru thong tin nguoi dung
+							nho them ma PIN
+2fa: username + password + phase2: ma OTP toi dinh danh do, nguoi dung se nhap ma OTP trong
+thoi gian quy dinh.
+
+1. Quan li nguoi dung: LDAP + LDAP server
+2. Xac thuc: 
+	- username + password: LDAP server,
+	- smartcard + PIN: MySQL?
+3. Nhat ky de quan li: MySQL , session, track login logout, change account infor, 
+   IP + datetime
+   đối tượng thư mục: directory object, connect to MySQL, query
+4. Web app
+
+LDAP + report.doc: Khai
+Frontend: Khoa + Lan
+smartcard + PIN + README.doc: Luc + Lan
+README: huong dan cai XAMPP, cai LDAP module, cai LDAP server
+
+deadline: 3/6/2021
+
+
+
+
+10 tuan bai tap lon ??
+Xet phuong dien minh khong hoc lap trinh web
+XAMPP, PHP, LDAP, LDAP server, session, MySQL
+
