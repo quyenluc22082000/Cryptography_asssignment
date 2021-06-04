@@ -1,8 +1,11 @@
 <?php
-    if(isset($_SESSION["id"])) {
-        header("Location:home.php");
-    }
-?>
+      echo(count($_POST));
+      var_dump($_POST);
+      var_dump($_SESSION);
+      if(isset($_SESSION["id"])) {
+          header("Location:home.php");
+      }
+  ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,6 +33,7 @@
     <title>Login</title>
 </head>
 <body>
+  
   <nav class="navbar navbar-light bg-primary">
     <div class="container-fluid">
       <a class="navbar-brand text-white" href="#">IAM - Identity and Access Management</a>
@@ -52,10 +56,11 @@
       </div>
 
       <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="check">
+        <input name="check" type="checkbox" class="form-check-input" id="check">
         <label class="form-check-label" for="check">Check me out</label>
       </div>
-
+      
+      <!-- <input type="submit" class="btn btn-primary" name="login" value="Submit"> -->
       <button name="login" type="submit" class="btn btn-primary">Submit</button>
     </form>
   </div>

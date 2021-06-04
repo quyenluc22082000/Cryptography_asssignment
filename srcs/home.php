@@ -1,108 +1,109 @@
 <?php
-session_start();
-include 'config.php';
-if(isset($_POST['login']))
-{
-    
-    $username = $_POST['username']; // Get username
-    $password = $_POST['password']; // get password
-    //query for match the user inputs
-    // $ret = mysqli_query($con,"SELECT * FROM login WHERE userName='$username' and password='$password'");
-    // $num = mysqli_fetch_array($ret);
+    session_start();
+    include 'config.php';
+    if(isset($_POST['login']))
+    {    
+        if(!isset($_SESSION['id'])){        
+            $username = $_POST['username']; // Get username
+            $password = $_POST['password']; // get password       
+            //dn: distinguish name
+            //uid: user id
+            //ou: organization unit
+        
+            // role 
+            // admin: lam gi cung duoc
+            // manager: chi coi duoc user detail vaf user log, them bot user k dc
+            // user: chi coi duoc thong tin cua chinh user
+            $role_arr = array("user", "manager", "admin");
+            $role = "";
+                
+            for($i = 0; $i < count($role_arr); $i++){
+                $ldap_dn = "uid=".$username.",ou=".$role_arr[$i].",ou=system";            
+                $ldap_password = $password;    
 
-    //dn: distinguish name
-    //uid: user id
-    //ou: organization unit
+                if (ldap_bind($ldap_con, $ldap_dn, $ldap_password)){
+                    $role = $role_arr[$i];                
+                    break;
+                }
+            }
 
-    // role 
-    // admin: lam gi cung duoc
-    // manager: chi coi duoc user detail vaf user log, them bot user k dc
-    // user: chi coi duoc thong tin cua chinh user
-    $role_arr = array("users", "manager", "admin");
-    $role = "";
-    
-    for($i = 0; $i < count($role_arr); $i++){
-        $ldap_dn = "uid=".$username.",ou=".$role_arr[$i].",ou=system";
-        $ldap_password = $password;    
-        if (ldap_bind($ldap_con, $ldap_dn, $ldap_password)){
-            $role = $role_arr[$i];
-            echo "Complete";
-            break;
+            //admin login
+            if($role ==""){
+                $ldap_dn = "uid=".$username.",ou=system";
+                if (ldap_bind($ldap_con, $ldap_dn, $ldap_password)){
+                    echo "Inside";
+                    $role = "admin";
+                    echo "<br>abc".$role;
+                }
+            }           
+        
+            //     echo "Bind Successful!" . "<br>";
+            // }
+            // else {
+            //     echo "Invalid user/pass or other error!";
+            // }     
+            
+            // if user inputs match if condition will runn
+            if ($role != ""){
+                $_SESSION['login'] = $username; // hold the user name in session
+                $_SESSION['userDn'] = $ldap_dn; // hold the user dn
+                $_SESSION['role'] = $role;            
+                $_SESSION['id'] = session_id(); // get the current session_id
+
+                
+                // $num['id']; // hold the user id in session
+                
+                $userId_db = $_SESSION['id'];
+                $username_db = $_SESSION['login'];
+                $uip = $_SERVER['REMOTE_ADDR']; // get the user ip
+                $action = "Login"; // query for inser user log in to data base
+                $log_query = "INSERT into userlog(userId,username,userIp,action) values('$userId_db','$username_db','$uip','$action')";
+                if(!mysqli_query($db_con, $log_query))
+                    echo "Cant Insert user log!";         
+            }
+            // If the userinput no matched with database else condition will run
+            else
+            {
+                $_SESSION['msg'] = "Invalid username or password";
+                $extra = "login.php";
+                $host = $_SERVER['HTTP_HOST'];
+                $uri = rtrim(dirname($_SERVER['PHP_SELF']),'/\\');
+                header("location:http://$host$uri/$extra");
+                exit();
+            }
         }
     }
-    echo "Outside";
-    echo "<br>abc".$role;
-    // echo "sth";
-    // $search_dn = "";
-    // $filter = "(cn=*)";
-    // for($i = 0; $i < count($role_arr); $i++){                        
-    //     $search_dn = "";
-    //     $justthese = array("username", "cn", "mail");
+    else if(isset($_POST['add-user'])){
+        if(isset($_SESSION['id'])){
+            $uid_add = $_POST['user-id'];
+            $userPassword_add = $_POST['password'];
+            $cn_add = $_POST['fname'];
+            $sn_add = $_POST['lname'];
+            $mail_add = $_POST['email'];
+            $mobile_add = $_POST['phone'];
 
-    //     $sr = ldap_search($ldap_con, $search_dn, $filter);
-    //     echo $sr;
-    //     $res = ldap_get_entries($ldap_con, $sr);
-    //     var_dump($res);
-    //     // for($j = 0; $j < count($res); $j++){
-    //     //     $id = $res[$j]['username'];
-    //     //     $name = $res[$j]['sn'];
-    //     //     $email = $res[$j]['mail'];
-    //     //     echo "<tr><td>".$id."</td>";
-    //     //     echo "<td>".$name."</td>";
-    //     //     echo "<td>".$email."</td>";
-    //     //     echo "<td><a href=\"edit.html\" class=\"btn btn-primary\">Edit</a></td>";
-    //     //     echo "<td><a href=\"#\" class=\"btn btn-danger\">Delete</a></td></tr>";
-    //     // }
-    // }
-
-    //     echo "Bind Successful!" . "<br>";
-    // }
-    // else {
-    //     echo "Invalid user/pass or other error!";
-    // }     
-    
-    // if user inputs match if condition will runn
-    if ($role != ""){
-        $_SESSION['login'] = $username; // hold the user name in session
-        $_SESSION['userDn'] = $ldap_dn; // hold the user dn
-        $_SESSION['role'] = $role;
-        echo "Hello ".$_SESSION['login'];
-        $_SESSION['id'] = session_id(); // get the current session_id
-        // $num['id']; // hold the user id in session
-
-        $uip = $_SERVER['REMOTE_ADDR']; // get the user ip
-        $action = "Login"; // query for inser user log in to data base
-        $log_query = "INSERT into userlog(userId,username,userIp,action) values('".$_SESSION['id']."','".$_SESSION['login']."','$uip','$action')";
-        if(!mysqli_query($db_con, $log_query))
-            echo "Cant Insert user log!";
-
-        // code redirect the page after login
-        $extra = "home.php";
+            //prepare data
+            $info["objectClass"] = "inetOrgPerson";
+            $info["cn"] = $cn_add;
+            $info["sn"] = $sn_add;
+            $info["mail"] = $mail_add;
+            $info["mobile"] = $mobile_add;
+            $info["userPassword"] = $userPassword_add;
+            $info["uid"] = $uid_add;        
+        
+            // add data to directory     
+            $new_userdn = "uid=".$uid_add.",ou=user,ou=system";       
+            $ldap_res = ldap_add($ldap_con, $new_userdn, $info);       
+        }
+        
+    }
+    else{
+        $extra = "login.php";
         $host = $_SERVER['HTTP_HOST'];
         $uri = rtrim(dirname($_SERVER['PHP_SELF']),'/\\');
         header("location:http://$host$uri/$extra");
-        exit();
+        exit();        
     }
-    // If the userinput no matched with database else condition will run
-    // else
-    // {
-    //     $_SESSION['msg'] = "Invalid username or password";
-    //     $extra = "login.php";
-    //     $host = $_SERVER['HTTP_HOST'];
-    //     $uri = rtrim(dirname($_SERVER['PHP_SELF']),'/\\');
-    //     header("location:http://$host$uri/$extra");
-    //     exit();
-    // }
-}
-else{
-    $extra = "login.php";
-    $host = $_SERVER['HTTP_HOST'];
-    $uri = rtrim(dirname($_SERVER['PHP_SELF']),'/\\');
-    header("location:http://$host$uri/$extra");
-    exit();
-}
-
-
 ?>
 
 <!DOCTYPE html>
@@ -136,7 +137,7 @@ else{
 
     <title>Home</title>
 </head>
-<body>
+<body>    
     <nav class="navbar navbar-light bg-primary">
         <div class="container-fluid">
           <a class="navbar-brand text-white" href="#">IAM - Identity and Access Management</a>
@@ -187,9 +188,28 @@ else{
 
                     <!-- query user detail - ldap -->
                     <?php
-                    $role_arr = array("users", "manager", "admin");
-                    
-
+                
+                    $role_arr = array("user", "manager", "admin");                    
+                    $search_dn = "";
+                    $filter = "(cn=*)";
+                    for($i = 0; $i < count($role_arr); $i++){                        
+                        $search_dn = "ou=".$role_arr[$i].",ou=system";
+                        // $justthese = array("username", "cn", "mail");
+                        // ldap_bind($ldap_con);
+                        $sr = ldap_search($ldap_con, $search_dn, $filter);                        
+                        $res = ldap_get_entries($ldap_con, $sr);
+                        
+                        for($j = 0; $j < $res['count']; $j++){
+                            $id = $res[$j]['uid'][0];
+                            $name = $res[$j]['sn'][0];
+                            $email = @$res[$j]['mail'][0] or "";
+                            echo "<tr><td>".$id."</td>";
+                            echo "<td>".$name."</td>";
+                            echo "<td>".$email."</td>";
+                            echo "<td><a href=\"edit.php\" class=\"btn btn-primary\">Edit</a></td>";
+                            echo "<td><a href=\"#\" class=\"btn btn-danger\">Delete</a></td></tr>";
+                        }
+                    }
                     ?>
                     
                 </table>
@@ -201,16 +221,28 @@ else{
                 <table class="logs table table-hover">
                     <tr>
                         <th>ID</th>
+                        <th>Name</th>
                         <th>Date</th>
-                        <th>Message</th>
+                        <th>Action</th>
                     </tr>
 
                     <!-- query userlog - mysql-->
-                    <tr>
-                        <td>1</td>
-                        <td>1/1/2000</td>
-                        <td>This is a log.</td>
-                    </tr>
+                    <?php
+                        $query = "SELECT * from userlog order by loginTime desc";
+                        $res = mysqli_query($db_con, $query);
+                        if(!$res)
+                            echo "Cant query";
+                        else{
+                            $row = mysqli_fetch_assoc($res);                            
+                            while($row){
+                                echo "<tr><td>{$row['userId']}</td>";
+                                echo "<td>{$row['username']}</td>";
+                                echo "<td>{$row['loginTime']}</td>";
+                                echo "<td>{$row['action']}</td></tr>";
+                                $row = mysqli_fetch_assoc($res);
+                            }                           
+                        }                                            
+                    ?>
                 </table>
 
                 <!-- ---------- Add user form ---------- -->
@@ -220,37 +252,37 @@ else{
                 <form action="" method="POST" class="new-user">
                     <div class="mb-3">
                         <label for="user-id" class="form-label">User ID</label>
-                        <input type="text" class="form-control" id="user-id">
+                        <input  name="user-id" type="text" class="form-control" id="user-id">
                     </div>
 
                     <div class="mb-3">
                       <label for="password" class="form-label">Password</label>
-                      <input type="password" class="form-control" id="password">
+                      <input name="password" type="password" class="form-control" id="password">
                     </div>
 
                     <div class="mb-3 row">
                         <div class="col">
                           <label for="first-name" class="form-label">First name</label>
-                          <input type="text" class="form-control" id="first-name" aria-label="First name">
+                          <input name="fname" type="text" class="form-control" id="first-name" aria-label="First name">
                         </div>
 
                         <div class="col">
                           <label for="last-name" class="form-label">Last name</label>
-                          <input type="text" class="form-control" id="last-name" aria-label="Last name">
+                          <input name="lname" type="text" class="form-control" id="last-name" aria-label="Last name">
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="email">
+                        <input name="email" type="email" class="form-control" id="email">
                     </div>
 
                     <div class="mb-3">
                         <label for="phone" class="form-label">Phone no.</label>
-                        <input type="text" class="form-control" id="phone">
+                        <input name="phone" type="text" class="form-control" id="phone">
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+                    <button type="submit" class="btn btn-primary" style="width: 100%" name="add-user">Submit</button>
                 </form>
             </div>
         </div>
