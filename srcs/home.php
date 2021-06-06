@@ -72,32 +72,8 @@
                 exit();
             }
         }
-    }
-    else if(isset($_POST['add-user'])){
-        if(isset($_SESSION['id'])){
-            $uid_add = $_POST['user-id'];
-            $userPassword_add = $_POST['password'];
-            $cn_add = $_POST['fname'];
-            $sn_add = $_POST['lname'];
-            $mail_add = $_POST['email'];
-            $mobile_add = $_POST['phone'];
-
-            //prepare data
-            $info["objectClass"] = "inetOrgPerson";
-            $info["cn"] = $cn_add;
-            $info["sn"] = $sn_add;
-            $info["mail"] = $mail_add;
-            $info["mobile"] = $mobile_add;
-            $info["userPassword"] = $userPassword_add;
-            $info["uid"] = $uid_add;        
-        
-            // add data to directory     
-            $new_userdn = "uid=".$uid_add.",ou=user,ou=system";       
-            $ldap_res = ldap_add($ldap_con, $new_userdn, $info);       
-        }
-        
-    }
-    else{
+    }    
+    else if(!isset($_SESSION['id'])){
         $extra = "login.php";
         $host = $_SERVER['HTTP_HOST'];
         $uri = rtrim(dirname($_SERVER['PHP_SELF']),'/\\');
@@ -202,12 +178,12 @@
                         for($j = 0; $j < $res['count']; $j++){
                             $id = $res[$j]['uid'][0];
                             $name = $res[$j]['sn'][0];
-                            $email = @$res[$j]['mail'][0] or "";
+                            $email = @$res[$j]['mail'][0];
                             echo "<tr><td>".$id."</td>";
                             echo "<td>".$name."</td>";
                             echo "<td>".$email."</td>";
-                            echo "<td><a href=\"edit.php\" class=\"btn btn-primary\">Edit</a></td>";
-                            echo "<td><a href=\"#\" class=\"btn btn-danger\">Delete</a></td></tr>";
+                            echo "<td><a href=\"edit.php?uid=".$id."&role=".$role_arr[$i]."\" class=\"btn btn-primary\">Edit</a></td>";
+                            echo "<td><a href=\"deleteUser.php?uid=".$id."&role=".$role_arr[$i]."\" class=\"btn btn-danger\">Delete</a></td></tr>";
                         }
                     }
                     ?>
@@ -249,10 +225,10 @@
 
                 <h1 class="new-user-title">Add new user</h1>
 
-                <form action="" method="POST" class="new-user">
+                <form action="addUser.php" method="POST" class="new-user">
                     <div class="mb-3">
                         <label for="user-id" class="form-label">User ID</label>
-                        <input  name="user-id" type="text" class="form-control" id="user-id">
+                        <input name="user-id" type="text" class="form-control" id="user-id">
                     </div>
 
                     <div class="mb-3">

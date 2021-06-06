@@ -1,5 +1,34 @@
 <?php
+    include 'config.php';
+    if(isset($_GET['uid'])){
+        $username = $_GET['uid'];
+        // $role_arr = array("user", "manager", "admin");
+        $role = $_GET['role'];   
+        
+        $search_dn = "uid=".$username.",ou=".$role.",ou=system";    
+        $filter = "(cn=*)";
+        $sr = @ldap_search($ldap_con, $search_dn, $filter);                        
+        if($sr){
+            $res = ldap_get_entries($ldap_con, $sr);
+        }
+    }
 
+    if(isset($_POST['edit-user'])){
+        // $entry['uid'] = $_POST['edit-uid'];
+        // $entry['use'] = $_POST['edit-password'];
+        $entry['cn'] = $_POST['edit-fname'];
+        $entry['sn'] = $_POST['edit-lname'];
+        $entry['mail'] = $_POST['edit-mail'];
+        $entry['mobile'] = $_POST['edit-phone'];
+        
+        // add attribute when its not exist, replace with new value
+        $ldap_dn = "uid=".$_POST['edit-uid'].",ou=".$_POST['edit-role'].",ou=system";
+        $res = ldap_mod_replace($ldap_con, $ldap_dn, $entry);
+        if($res)
+            echo "Replace successful!";
+        else
+            echo "Replace Failed!";
+    }
 ?>
 
 <!DOCTYPE html>
@@ -31,47 +60,47 @@
 <body>
     <nav class="navbar navbar-light bg-primary">
         <div class="container-fluid">
-          <a class="navbar-brand text-white" href="#">IAM - Identity and Access Management</a>
+          <a class="navbar-brand text-white" href="home.php">IAM - Identity and Access Management</a>
         </div>
     </nav>
 
     <div class="container">
         <h1 class="new-user-title">Edit user</h1>
     
-        <form action="home.html" method="POST" class="new-user">
+        <form method="POST" class="new-user">
             <div class="mb-3">
                 <label for="user-id" class="form-label">User ID</label>
-                <input type="text" class="form-control" id="user-id">
+                <input name="edit-uid" type="text" class="form-control" id="user-id" value="<?php echo $res[0]['uid'][0];?>" readonly>
             </div>
     
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password">
+                <label for="role" class="form-label">Role</label>
+                <input name="edit-role" type="text" class="form-control" id="role" value="<?php echo $role;?>" readonly>
             </div>
     
             <div class="mb-3 row">
                 <div class="col">
                     <label for="first-name" class="form-label">First name</label>
-                    <input type="text" class="form-control" id="first-name" aria-label="First name">
+                    <input name="edit-fname" type="text" class="form-control" id="first-name" aria-label="First name" value="<?php echo @$res[0]['cn'][0];?>">
                 </div>
     
                 <div class="col">
                     <label for="last-name" class="form-label">Last name</label>
-                    <input type="text" class="form-control" id="last-name" aria-label="Last name">
+                    <input name="edit-lname" type="text" class="form-control" id="last-name" aria-label="Last name" value="<?php echo @$res[0]['sn'][0];?>">
                 </div>
             </div>
     
             <div class="mb-3">
                 <label for="email" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="email">
+                <input name="edit-mail" type="email" class="form-control" id="email" value="<?php echo @$res[0]['mail'][0];?>">
             </div>
     
             <div class="mb-3">
                 <label for="phone" class="form-label">Phone no.</label>
-                <input type="text" class="form-control" id="phone">
+                <input name="edit-phone" type="text" class="form-control" id="phone"  value="<?php echo @$res[0]['mobile'][0];?>">
             </div>
     
-            <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%" name="edit-user">Submit</button>
         </form>
     </div>
 

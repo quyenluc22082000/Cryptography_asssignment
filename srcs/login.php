@@ -1,7 +1,7 @@
 <?php
-      echo(count($_POST));
-      var_dump($_POST);
-      var_dump($_SESSION);
+      // echo(count($_POST));
+      // var_dump($_POST);
+      // var_dump($_SESSION);
       if(isset($_SESSION["id"])) {
           header("Location:home.php");
       }
