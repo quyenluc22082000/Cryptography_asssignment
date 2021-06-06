@@ -26,16 +26,7 @@
                     break;
                 }
             }
-
-            //admin login
-            if($role ==""){
-                $ldap_dn = "uid=".$username.",ou=system";
-                if (ldap_bind($ldap_con, $ldap_dn, $ldap_password)){
-                    echo "Inside";
-                    $role = "admin";
-                    echo "<br>abc".$role;
-                }
-            }           
+                    
         
             //     echo "Bind Successful!" . "<br>";
             // }

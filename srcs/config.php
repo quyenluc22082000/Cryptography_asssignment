@@ -16,7 +16,7 @@ if (mysqli_connect_errno())
 
 $ldap_con = ldap_connect("127.0.0.1", 10389);
     
-// mot so may chu dc cau hinh khac nhau, , dat phien ban giao thuc LDAP
+// set LDAP version 
 ldap_set_option($ldap_con, LDAP_OPT_PROTOCOL_VERSION, 3);
 ldap_set_option($ldap_con, LDAP_OPT_REFERRALS, 0);
 ?>
