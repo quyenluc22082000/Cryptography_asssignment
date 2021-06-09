@@ -6,7 +6,8 @@
     //check new user info
 
     if(isset($_POST['add-user'])){
-        $entry['user-id'] = $_POST['user-id'];
+        $entry['objectClass'] = "inetOrgPerson";
+        $entry['uid'] = $_POST['user-id'];
         $entry['userpassword'] = $_POST['password'];
         $entry['cn'] = $_POST['fname'];
         $entry['sn'] = $_POST['lname'];
