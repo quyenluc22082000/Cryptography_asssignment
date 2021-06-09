@@ -1,0 +1,12 @@
+version: 1
+
+#!RESULT ERROR
+#!CONNECTION ldap://localhost:10389
+#!DATE 2021-06-07T08:10:36.482
+#!ERROR  [LDAP result code 65 - objectClassViolation] OBJECT_CLASS_VIOLATION: failed for MessageType : ADD_REQUEST Message ID : 11     Add Request : Entry     dn: prefNodeName=sysPrefRoot,ou=system     objectClass: extensibleObject     objectClass: organizationalUnit     objectClass: top     prefNodeName: sysPrefRoot : ERR_279 Required attributes [ou(2.5.4.11)] not found within entry prefNodeName=sysPrefRoot,ou=system
+dn: prefNodeName=sysPrefRoot,ou=system
+objectClass: extensibleObject
+objectClass: organizationalUnit
+objectClass: top
+prefNodeName: sysPrefRoot
+

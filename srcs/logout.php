@@ -11,8 +11,8 @@ $action="Logout";
 $query=mysqli_query($db_con,"insert into userlog(userId,username,userIp,action) values('$uid','$username','$uip','$action')");
 
 if($query){
-    session_unset();
-    //session_destroy();
+    // session_unset();
+    session_destroy();
     ldap_close($ldap_con);
 }
 

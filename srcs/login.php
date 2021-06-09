@@ -1,11 +1,9 @@
 <?php
-      // echo(count($_POST));
-      // var_dump($_POST);
-      // var_dump($_SESSION);
+      session_start();
       if(isset($_SESSION["id"])) {
-          header("Location:home.php");
+          header("Location:validation.php");
       }
-  ?>
+?> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +41,7 @@
   <div class="container">
     <h1 class="new-user-title">Login</h1>
 
-    <form action="home.php" method="POST">
+    <form action="validation.php" method="POST">
       <div class="mb-3">
         <label for="username" class="form-label">Username</label>
         <input name="username" class="form-control" id="email" aria-describedby="emailHelp">
