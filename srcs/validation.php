@@ -30,7 +30,7 @@
             for($i = 0; $i < count($role_arr); $i++){
                 $ldap_dn = "uid=".$username.",ou=".$role_arr[$i].",ou=system";            
                 $ldap_password = $password;    
-                if (ldap_bind($ldap_con, $ldap_dn, $ldap_password)){
+                if (@ldap_bind($ldap_con, $ldap_dn, $ldap_password)){
                     $role = $role_arr[$i];                
                     break;
                 }
@@ -39,7 +39,7 @@
             //admin login
             if($role ==""){
                 $ldap_dn = "uid=".$username.",ou=system";
-                if (ldap_bind($ldap_con, $ldap_dn, $ldap_password)){
+                if (@ldap_bind($ldap_con, $ldap_dn, $ldap_password)){
                     echo "Inside";
                     $role = "admin";
                     echo "<br>abc".$role;
@@ -70,8 +70,9 @@
                     $res = ldap_get_entries($ldap_con, $sr);
                 }
                 
-                // $email_send = @$res[0]['mail'][0];
-                $email_send = 'luc.nguyenkhmt@hcmut.edu.vn';
+                $email_send = @$res[0]['mail'][0];
+                
+                // $email_send = 'luc.nguyenkhmt@hcmut.edu.vn';
                 $_SESSION['email'] = $email_send;
                 date_default_timezone_set("Asia/Ho_Chi_Minh");
                 $time_send =  date("Y-m-d H:i:s");
@@ -92,14 +93,7 @@
                 if(!mysqli_query($db_con, $otp_insert))
                     echo "Cant Insert OTP!";  
                 // $num['id']; // hold the user id in session
-                
-                $userId_db = $_SESSION['id'];
-                $username_db = $_SESSION['login'];
-                $uip = $_SERVER['REMOTE_ADDR']; // get the user ip
-                $action = "Login"; // query for inser user log in to data base
-                $log_query = "INSERT into userlog(userId,username,userIp,action) values('$userId_db','$username_db','$uip','$action')";
-                if(!mysqli_query($db_con, $log_query))
-                    echo "Cant Insert user log!";         
+                         
             }
             // If the userinput no matched with database else condition will run
             else

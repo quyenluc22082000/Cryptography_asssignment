@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
     <style>
@@ -53,6 +53,18 @@
                     <spap>Users</span>
                 </h6>
 
+                <?php
+                    if($_SESSION['role'] == "admin"){
+                        echo "
+                        <h6 class=\"managers m-0 p-3\">
+                        <i class=\"fas fa-pen-square\"></i>
+                        <span>Managers</span>
+                        </h6>
+                        ";
+                    }
+                ?>
+                
+
                 <h6 class="logs m-0 p-3">
                     <i class="fas fa-pen-square"></i>
                     <span>Logs</span>
@@ -68,6 +80,7 @@
                 </h6>
             </div>
 
+            
             <!-- Right -->
             <div class="col-9">
                 <!-- ---------- Users table ---------- -->
@@ -85,7 +98,7 @@
                     <!-- query user detail - ldap -->
                     <?php
                 
-                    $role_arr = array("user", "manager", "admin");                    
+                    $role_arr = array("user");                    
                     $search_dn = "";
                     $filter = "(cn=*)";
                     for($i = 0; $i < count($role_arr); $i++){                        
@@ -102,13 +115,56 @@
                             echo "<tr><td>".$id."</td>";
                             echo "<td>".$name."</td>";
                             echo "<td>".$email."</td>";
-                            echo "<td><a href=\"edit.php?uid=".$id."&role=".$role_arr[$i]."\" class=\"btn btn-primary\">Edit</a></td>";
-                            echo "<td><a href=\"deleteUser.php?uid=".$id."&role=".$role_arr[$i]."\" class=\"btn btn-danger\">Delete</a></td></tr>";
+                            if($_SESSION["role"] == "admin"){
+                                echo "<td><a href=\"edit.php?uid=".$id."&role=".$role_arr[$i]."\" class=\"btn btn-primary\">Edit</a></td>";
+                                echo "<td><a href=\"deleteUser.php?uid=".$id."&role=".$role_arr[$i]."\" class=\"btn btn-danger\">Delete</a></td></tr>";
+                            }
                         }
                     }
                     ?>
                     
                 </table>
+                
+
+                <?php 
+                if($_SESSION['role'] == "admin"){
+
+                    echo "
+                        <h1 class=\"managers-title\">Managers</h1>
+
+                        <table class=\"managers table table-hover\">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+
+                    ";
+                    $role = "manager";
+                    $filter = "(cn=*)";
+                    $search_dn = "";
+                    $search_dn = "ou=".$role.",ou=system";
+                    // $justthese = array("username", "cn", "mail");
+                    // ldap_bind($ldap_con);
+                    $sr = ldap_search($ldap_con, $search_dn, $filter);                        
+                    $res = ldap_get_entries($ldap_con, $sr);
+                        
+                    for($j = 0; $j < $res['count']; $j++){
+                        $id = $res[$j]['uid'][0];
+                        $name = $res[$j]['sn'][0];
+                        $email = @$res[$j]['mail'][0];
+                        echo "<tr><td>".$id."</td>";
+                        echo "<td>".$name."</td>";
+                        echo "<td>".$email."</td>";
+                        echo "<td><a href=\"edit.php?uid=".$id."&role=".$role."\" class=\"btn btn-primary\">Edit</a></td>";
+                        echo "<td><a href=\"deleteUser.php?uid=".$id."&role=".$role."\" class=\"btn btn-danger\">Delete</a></td></tr>";
+                    }
+
+                    echo  "</table>";
+                }   
+                ?>
 
                 <!-- ---------- Logs table ---------- -->
 

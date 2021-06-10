@@ -19,10 +19,21 @@
             }                      
         }
     }
-    if(isset($_SESSION['validated']) && $_SESSION['role'] == "user"){
-        header("Location:detailInformation.php");
+    if(isset($_SESSION['validated'])){
+        $userId_db = $_SESSION['id'];
+        $username_db = $_SESSION['login'];
+        $uip = $_SERVER['REMOTE_ADDR']; // get the user ip
+        $action = "Login"; // query for inser user log in to data base
+        $log_query = "INSERT into userlog(userId,username,userIp,action) values('$userId_db','$username_db','$uip','$action')";
+        if(!mysqli_query($db_con, $log_query))
+            echo "Cant Insert user log!";
+
+        if($_SESSION['role'] == "user"){
+            header("Location:detailInformation.php");
+        }
+        else{
+            header("Location:home.php");
+        }   
     }
-    else if(isset($_SESSION['validated'])){
-        header("Location:home.php");
-    }
+    
 ?>
