@@ -59,6 +59,7 @@
                 $_SESSION['role'] = $role;            
                 $_SESSION['id'] = session_id(); // get the current session_id
                 
+                
 
                 //send email and save to database
 
@@ -70,29 +71,36 @@
                     $res = ldap_get_entries($ldap_con, $sr);
                 }
                 
-                $email_send = @$res[0]['mail'][0];
+                $_SESSION["name"] = @$res[0]['sn'][0];
                 
-                // $email_send = 'luc.nguyenkhmt@hcmut.edu.vn';
-                $_SESSION['email'] = $email_send;
-                date_default_timezone_set("Asia/Ho_Chi_Minh");
-                $time_send =  date("Y-m-d H:i:s");
-                
+                if($role == "user"){
+                    header("Location:detailInformation.php");
+                }
 
-                $otp = rand(100000,999999);
-                $to      = $email_send;
-                $subject = 'Test Crypto OTP to login';
-                $message = 'this message otp '.$otp;
-                $headers = 'From: ancucchocon@gmail.com'       . "\r\n" .
-                            'Reply-To: ancucchocon@gmail.com' . "\r\n" .
-                            'X-Mailer: PHP/' . phpversion();
+                // $email_send = @$res[0]['mail'][0];
+                if($role != "user"){
+                    $email_send = 'luc.nguyenkhmt@hcmut.edu.vn';
+                    $_SESSION['email'] = $email_send;
+                    date_default_timezone_set("Asia/Ho_Chi_Minh");
+                    $time_send =  date("Y-m-d H:i:s");
+                    
 
-                mail($to, $subject, $message, $headers);
+                    $otp = rand(100000,999999);
+                    $to      = $email_send;
+                    $subject = 'Test Crypto OTP to login';
+                    $message = 'this message otp '.$otp;
+                    $headers = 'From: ancucchocon@gmail.com'       . "\r\n" .
+                                'Reply-To: ancucchocon@gmail.com' . "\r\n" .
+                                'X-Mailer: PHP/' . phpversion();
 
-                //save to db
-                $otp_insert = "INSERT into otp_expired(email,expire,otp,is_expired) values('$email_send','$time_send','$otp',0)";
-                if(!mysqli_query($db_con, $otp_insert))
-                    echo "Cant Insert OTP!";  
-                // $num['id']; // hold the user id in session
+                    mail($to, $subject, $message, $headers);
+
+                    //save to db
+                    $otp_insert = "INSERT into otp_expired(email,expire,otp,is_expired) values('$email_send','$time_send','$otp',0)";
+                    if(!mysqli_query($db_con, $otp_insert))
+                        echo "Cant Insert OTP!";  
+                    // $num['id']; // hold the user id in session
+                    }
                          
             }
             // If the userinput no matched with database else condition will run

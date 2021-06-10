@@ -1,4 +1,5 @@
 <?php
+    session_start();
     include 'config.php';
     if(isset($_GET['uid'])){
         $username = $_GET['uid'];
@@ -24,10 +25,20 @@
         // add attribute when its not exist, replace with new value
         $ldap_dn = "uid=".$_POST['edit-uid'].",ou=".$_POST['edit-role'].",ou=system";
         $res = ldap_mod_replace($ldap_con, $ldap_dn, $entry);
-        if($res)
+        if($res){
+            $userId_db = $_SESSION['id'];
+            $username_db = $_SESSION['login'];
+            $uip = $_SERVER['REMOTE_ADDR']; // get the user ip
+            $action = "Edit user ".$entry['sn']; // query for inser user log in to data base
+            $log_query = "INSERT into userlog(userId,username,userIp,action) values('$userId_db','$username_db','$uip','$action')";
+            if(!mysqli_query($db_con, $log_query))
+            echo "Cant edit user log!";
             echo "Replace successful!";
+        }
         else
             echo "Replace Failed!";
+
+        header("Location:home.php");
     }
 ?>
 
@@ -70,12 +81,12 @@
         <form method="POST" class="new-user">
             <div class="mb-3">
                 <label for="user-id" class="form-label">User ID</label>
-                <input name="edit-uid" type="text" class="form-control" id="user-id" value="<?php echo $res[0]['uid'][0];?>" readonly>
+                <input name="edit-uid" type="text" class="form-control" id="user-id" value="<?php echo @$res[0]['uid'][0];?>" readonly>
             </div>
     
             <div class="mb-3">
                 <label for="role" class="form-label">Role</label>
-                <input name="edit-role" type="text" class="form-control" id="role" value="<?php echo $role;?>" readonly>
+                <input name="edit-role" type="text" class="form-control" id="role" value="<?php echo @$role;?>" readonly>
             </div>
     
             <div class="mb-3 row">

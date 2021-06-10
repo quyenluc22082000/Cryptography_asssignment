@@ -1,6 +1,10 @@
 <?php
     session_start();
     include 'config.php';
+    if($_SESSION["role"] != "admin" && $_SESSION["role"] != "manager"){
+        header('Location:login.php');
+    }
+   
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,7 +41,25 @@
     <nav class="navbar navbar-light bg-primary">
         <div class="container-fluid">
           <a class="navbar-brand text-white" href="#">IAM - Identity and Access Management</a>
+          <div class="dropdown">
+                <img src="https://thembatutors.com/wp-content/uploads/2018/10/demo-avatar.jpg" alt="Avatar" style=" vertical-align: middle;width: 40px;height: 40px;border-radius: 50%;">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <?php 
+                        echo "".$_SESSION["name"]."'s name";
+                    ?>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="#">Profle</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="logout.php" style="color:red;">Sign out</a></li>
+                </ul>
+            </div>
+
         </div>
+
+
     </nav>
 
     <div class="container m-0">
